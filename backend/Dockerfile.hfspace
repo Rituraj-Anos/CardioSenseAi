@@ -1,0 +1,39 @@
+# Hugging Face Spaces (Docker SDK) image for the CardioSense backend.
+# HF Spaces runs the container on port 7860 and gives ~16GB RAM on the free
+# tier — enough to run the full ML stack INCLUDING live report OCR.
+#
+# HF caches OCR model weights under the persisted home dir on first use.
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    FLAGS_use_mkldnn=0 \
+    PORT=7860 \
+    HOME=/home/appuser \
+    HF_HOME=/home/appuser/.cache
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libsndfile1 libgomp1 tesseract-ocr curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Non-root user with a writable home (HF requires the app to run as non-root
+# and to write caches/model weights under a writable path).
+RUN useradd -m -u 1000 appuser
+WORKDIR /app
+
+COPY backend/requirements.txt ./requirements.txt
+RUN pip install --only-binary=:all: -r requirements.txt
+
+COPY backend/ ./backend/
+COPY ml/artifacts/ ./ml/artifacts/
+
+RUN mkdir -p /home/appuser/.cache /data/storage && chown -R appuser /app /home/appuser /data
+USER appuser
+
+WORKDIR /app/backend
+EXPOSE 7860
+
+# Apply migrations, then serve on the HF port. Full OCR warmup enabled — the
+# free Space has the RAM for it.
+CMD sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-7860} --proxy-headers"
