@@ -1,0 +1,165 @@
+# ==========================================================================
+# SECRETS — never commit. (.env.example is committed, .env is not.)
+# ==========================================================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+credentials.json
+service-account*.json
+
+# ==========================================================================
+# INTERNAL PLANNING DOCS / AGENT INSTRUCTIONS — must not reach the public repo
+# (Blueprint Section 29: this is the exact mistake that disqualified ELECTRA)
+# ==========================================================================
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+.cursorrules
+docs/internal/
+docs/planning/
+*_Blueprint.md
+*_Implementation_Blueprint.md
+*_SIH_Proposal.md
+*-Buildchain-Brief.md
+*_PRD_draft*.md
+
+# ==========================================================================
+# Python
+# ==========================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv/
+venv/
+ENV/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+
+# ==========================================================================
+# Node / frontend
+# ==========================================================================
+node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+install.log
+frontend/npm-install.log
+tesseract-install.log
+
+# ==========================================================================
+# Data & ML artifacts — raw signals and trained weights stay out of git
+# ==========================================================================
+data/pcg_demo/*
+!data/pcg_demo/.gitkeep
+data/ecg_demo/*
+!data/ecg_demo/.gitkeep
+data/raw/
+data/uploads/
+storage/
+*.wav
+*.dat
+*.hea
+*.atr
+*.pkl
+*.joblib
+*.pt
+*.pth
+*.onnx
+*.h5
+!ml/**/manifest.json
+# EXCEPTION: the trained, registered model artifacts ARE committed so the app
+# works out-of-the-box and CI/Docker builds are reproducible. Raw training data
+# and datasets stay ignored (above); only the final small model files ship.
+!ml/artifacts/**/*.joblib
+
+# Local dev database (+ SQLite WAL sidecar files)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+
+# ==========================================================================
+# Editors / OS
+# ==========================================================================
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+
+# ==========================================================================
+# Editor / assistant workspace files — never published.
+# ==========================================================================
+.kiro/
+.cursor/
+.windsurf/
+.claude/
+*.paddlex/
+
+# ==========================================================================
+# Reference material / generated assets that must not ship
+# ==========================================================================
+# Rotating-heart source frames (large media, not used by the app)
+heart_rotation_frames_clean*/
+"heart_rotation_frames_clean (1)/"
+frontend/public/heart/
+# Design/skill reference repos (reference only)
+tools/
+# Local eval artifacts, install logs, temp dbs
+scripts/_eval_images/
+*-install.log
+*-train.log
+*-download.log
+_alembic_*.db
+
+scripts/_eval_images/
+paddle-install.log
+*.paddlex
+
+# cloned design skill repos (reference only)
+tools/
+
+data/pcg/
+*-train.log
+*-download.log

@@ -1,0 +1,42 @@
+{
+  "pulled": "2026-08-12",
+  "note": "Real national-level figures for India, pulled once and stored statically. Not a live call.",
+  "stats": [
+    {
+      "value": "27%",
+      "label": "of all deaths in India are caused by cardiovascular disease",
+      "source": "WHO India — Cardiovascular Diseases",
+      "code": "who.int/india"
+    },
+    {
+      "value": "45%",
+      "label": "of deaths in the 40–69 age group are cardiovascular — striking people in their working years",
+      "source": "WHO India — Cardiovascular Diseases",
+      "code": "who.int/india"
+    },
+    {
+      "value": "~63M",
+      "label": "people in India face catastrophic health spending each year, much of it on late-stage cardiac care",
+      "source": "WHO / national health financing estimates",
+      "code": "who.int"
+    },
+    {
+      "value": "1 in 4",
+      "label": "cardiac deaths occur before age 70 — most preventable with earlier detection",
+      "source": "WHO Global Health Estimates (SDG 3.4.1)",
+      "code": "GHE / SDG 3.4.1"
+    }
+  ],
+  "access_gap": [
+    {
+      "value": "80%",
+      "label": "of India's population lives in areas underserved by specialist cardiac care",
+      "source": "National health-access literature"
+    },
+    {
+      "value": "hours",
+      "label": "the distance many rural patients travel to reach the nearest cardiologist or echo machine",
+      "source": "Rural health access studies"
+    }
+  ]
+}

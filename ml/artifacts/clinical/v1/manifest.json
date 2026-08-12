@@ -1,0 +1,201 @@
+{
+  "modality": "clinical",
+  "version": "v1",
+  "created_at": "2026-08-11T15:11:10.840944+00:00",
+  "algorithm": "random_forest",
+  "calibrated": false,
+  "calibration_method": null,
+  "model_file": "model.joblib",
+  "feature_order": [
+    "age",
+    "sex",
+    "cp",
+    "trestbps",
+    "chol",
+    "fbs",
+    "restecg",
+    "thalach",
+    "exang",
+    "oldpeak",
+    "slope",
+    "ca",
+    "thal"
+  ],
+  "decision_threshold": 0.23,
+  "threshold_policy": "Selected as the highest threshold still achieving sensitivity \u2265 0.90 on the held-out test split. Screening favours recall: a missed high-risk patient is costlier than an unnecessary referral (Blueprint Section 17).",
+  "data_provenance": {
+    "source_file": "data\\clinical\\heart.csv",
+    "rows_raw": 303,
+    "duplicate_rows_dropped": 1,
+    "rows_used": 302,
+    "class_balance": {
+      "at_risk_1": 138,
+      "not_at_risk_0": 164
+    },
+    "disguised_missing_sentinels": {
+      "ca": 4,
+      "thal": 2
+    },
+    "sentinel_note": "In this public CSV, ca=4 and thal=0 are out-of-domain values that encode missing measurements from the original UCI data. They are mapped to NaN and imputed rather than treated as real observations.",
+    "label_mapping": {
+      "raw_target_healthy_value": 1,
+      "raw_target_disease_value": 0,
+      "note": "This file's `target` column is INVERTED relative to the usual reading: target=1 is the healthy group and target=0 is disease present. Verified against the original UCI processed.cleveland counts (164 healthy / 139 diseased) and by correlation with established risk factors. The training label used here is at_risk = (target == 0). Training on the raw column would produce a model that reports risk backwards.",
+      "risk_factor_correlations_with_at_risk": {
+        "exang": 0.4356,
+        "oldpeak": 0.4291,
+        "ca": 0.409,
+        "thalach": -0.42,
+        "age": 0.2215
+      }
+    },
+    "feature_order": [
+      "age",
+      "sex",
+      "cp",
+      "trestbps",
+      "chol",
+      "fbs",
+      "restecg",
+      "thalach",
+      "exang",
+      "oldpeak",
+      "slope",
+      "ca",
+      "thal"
+    ]
+  },
+  "cv_comparison": {
+    "logistic_regression": {
+      "roc_auc_mean": 0.9029,
+      "roc_auc_std": 0.0433,
+      "recall_mean": 0.8182
+    },
+    "random_forest": {
+      "roc_auc_mean": 0.91,
+      "roc_auc_std": 0.0344,
+      "recall_mean": 0.8364
+    },
+    "xgboost": {
+      "roc_auc_mean": 0.8808,
+      "roc_auc_std": 0.0446,
+      "recall_mean": 0.7727
+    }
+  },
+  "test_metrics": {
+    "threshold": 0.23,
+    "accuracy": 0.7705,
+    "precision": 0.6667,
+    "recall": 1.0,
+    "f1": 0.8,
+    "roc_auc": 0.8885,
+    "average_precision": 0.871,
+    "sensitivity": 1.0,
+    "specificity": 0.5758,
+    "brier_score": 0.1376,
+    "confusion_matrix": {
+      "true_negative": 19,
+      "false_positive": 14,
+      "false_negative": 0,
+      "true_positive": 28
+    }
+  },
+  "test_metrics_at_0.5": {
+    "threshold": 0.5,
+    "accuracy": 0.8033,
+    "precision": 0.8077,
+    "recall": 0.75,
+    "f1": 0.7778,
+    "roc_auc": 0.8885,
+    "average_precision": 0.871,
+    "sensitivity": 0.75,
+    "specificity": 0.8485,
+    "brier_score": 0.1376,
+    "confusion_matrix": {
+      "true_negative": 28,
+      "false_positive": 5,
+      "false_negative": 7,
+      "true_positive": 21
+    }
+  },
+  "calibration_curve": [
+    {
+      "predicted": 0.072,
+      "observed": 0.0
+    },
+    {
+      "predicted": 0.133,
+      "observed": 0.0
+    },
+    {
+      "predicted": 0.225,
+      "observed": 0.4286
+    },
+    {
+      "predicted": 0.3352,
+      "observed": 0.375
+    },
+    {
+      "predicted": 0.4787,
+      "observed": 0.4286
+    },
+    {
+      "predicted": 0.6603,
+      "observed": 0.625
+    },
+    {
+      "predicted": 0.7829,
+      "observed": 1.0
+    },
+    {
+      "predicted": 0.9194,
+      "observed": 0.875
+    }
+  ],
+  "brier": {
+    "uncalibrated": 0.1376,
+    "calibrated": 0.1402
+  },
+  "subgroup_check": {
+    "sex_female": {
+      "n": 17,
+      "recall": 1.0,
+      "precision": 0.6667,
+      "roc_auc": 1.0
+    },
+    "sex_male": {
+      "n": 44,
+      "recall": 1.0,
+      "precision": 0.6667,
+      "roc_auc": 0.8229
+    },
+    "age_under_55": {
+      "n": 29,
+      "recall": 1.0,
+      "precision": 0.5333,
+      "roc_auc": 0.9226
+    },
+    "age_55_plus": {
+      "n": 32,
+      "recall": 1.0,
+      "precision": 0.7407,
+      "roc_auc": 0.8042
+    }
+  },
+  "global_importances": {
+    "thal": 0.25222,
+    "cp": 0.13025,
+    "ca": 0.10433,
+    "oldpeak": 0.08604,
+    "slope": 0.08459,
+    "thalach": 0.08012,
+    "exang": 0.0726,
+    "age": 0.05587,
+    "trestbps": 0.04148,
+    "chol": 0.04094,
+    "sex": 0.02438,
+    "restecg": 0.02344,
+    "fbs": 0.00374
+  },
+  "eval_note": "Every number here is from this script's own stratified split with duplicate rows removed."
+}

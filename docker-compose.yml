@@ -1,0 +1,58 @@
+# CardioSense AI — local/staging stack: Postgres + backend + frontend.
+# Usage:
+#   1. cp .env.example .env  and set SECRET_KEY (python -c "import secrets;print(secrets.token_urlsafe(64))")
+#   2. docker compose up --build
+#   3. open http://localhost:8080   (frontend)   ·   http://localhost:8000/docs (API)
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: cardiosense
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cardiosense-dev}
+      POSTGRES_DB: cardiosense
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cardiosense"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env}
+      DATABASE_URL: postgresql+psycopg://cardiosense:${POSTGRES_PASSWORD:-cardiosense-dev}@db:5432/cardiosense
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080}
+      STORAGE_LOCAL_PATH: /data/storage
+    volumes:
+      - storage:/data/storage
+    depends_on:
+      db:
+        condition: service_healthy
+    # Apply migrations, then serve.
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers"
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  storage:

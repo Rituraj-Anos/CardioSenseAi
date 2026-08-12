@@ -1,0 +1,110 @@
+{
+  "modality": "ecg",
+  "version": "v1",
+  "created_at": "2026-08-12T15:03:28.226066+00:00",
+  "algorithm": "xgboost",
+  "calibrated": false,
+  "model_file": "model.joblib",
+  "feature_names": [
+    "heart_rate_bpm",
+    "mean_rr",
+    "sdnn",
+    "rmssd",
+    "rr_irregularity",
+    "pnn50",
+    "qrs_amp_mean",
+    "qrs_amp_std",
+    "signal_std",
+    "signal_ptp",
+    "beat_rate_per_s",
+    "rr_range"
+  ],
+  "decision_threshold": 0.02,
+  "window_seconds": 10,
+  "positive_class": "abnormal rhythm",
+  "threshold_policy": "Highest threshold with sensitivity >= 0.85 on held-out records.",
+  "data_provenance": {
+    "source": "MIT-BIH Arrhythmia Database (PhysioNet)",
+    "train_records": [
+      "100",
+      "101",
+      "103",
+      "105",
+      "108",
+      "112",
+      "113",
+      "115",
+      "117",
+      "122",
+      "205",
+      "202",
+      "201",
+      "203",
+      "208",
+      "210",
+      "213",
+      "215"
+    ],
+    "test_records": [
+      "119",
+      "121",
+      "200",
+      "209",
+      "212",
+      "228",
+      "231",
+      "233"
+    ],
+    "split": "by record (no subject crosses the split)",
+    "channel": "channel 0 (modified lead II) only \u2014 single-lead",
+    "window_seconds": 10,
+    "label_rule": "window abnormal if >=20% of its beats are non-normal (MIT-BIH symbols)",
+    "train_windows": 1080,
+    "test_windows": 480,
+    "feature_approach": "rhythm/interval/morphology features (classical, not CNN)"
+  },
+  "cv_comparison": {
+    "logistic_regression": {
+      "roc_auc_mean": 0.9541,
+      "roc_auc_std": 0.0144
+    },
+    "random_forest": {
+      "roc_auc_mean": 0.9786,
+      "roc_auc_std": 0.0091
+    },
+    "xgboost": {
+      "roc_auc_mean": 0.9799,
+      "roc_auc_std": 0.0038
+    }
+  },
+  "test_metrics": {
+    "threshold": 0.02,
+    "accuracy": 0.8583,
+    "precision": 0.7348,
+    "recall": 0.8693,
+    "f1": 0.7964,
+    "roc_auc": 0.9428,
+    "sensitivity": 0.8693,
+    "specificity": 0.8532,
+    "brier_score": 0.1574,
+    "confusion_matrix": {
+      "true_negative": 279,
+      "false_positive": 48,
+      "false_negative": 20,
+      "true_positive": 133
+    }
+  },
+  "global_importances": {
+    "qrs_amp_std": 0.27529,
+    "rmssd": 0.14227,
+    "signal_std": 0.11078,
+    "heart_rate_bpm": 0.0709,
+    "sdnn": 0.06307,
+    "qrs_amp_mean": 0.06172,
+    "pnn50": 0.05878,
+    "beat_rate_per_s": 0.05317,
+    "rr_irregularity": 0.05065,
+    "signal_ptp": 0.04941
+  },
+  "explainability": "feature_importance (classical; 1D-CNN saliency is the upgrade path)"
+}

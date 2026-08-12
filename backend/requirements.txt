@@ -1,0 +1,59 @@
+# CardioSense AI — backend dependencies
+# Pinned deliberately for reproducible builds. Bump intentionally, not accidentally.
+
+# ---- Web / API ----
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.1
+python-multipart==0.0.20
+# Required by pydantic's EmailStr, which the auth schemas use.
+email-validator==2.2.0
+
+# ---- Persistence ----
+SQLAlchemy==2.0.36
+alembic==1.14.0
+# Postgres driver — used when DATABASE_URL points at Postgres.
+psycopg[binary]==3.2.3
+
+# ---- Security (Blueprint Section 16) ----
+argon2-cffi==23.1.0
+PyJWT==2.10.1
+
+# ---- Clinical ML (Blueprint Section 17) ----
+numpy==2.2.1
+pandas==2.2.3
+scikit-learn==1.6.0
+# (wfdb pinned in the ECG section below; 4.3.1 fixes a numpy-2 overflow in the
+#  annotation reader present in 4.1.x)
+# xgboost 2.1.3 predates scikit-learn 1.6's estimator-tags API and silently
+# fails inside cross_val_score (every fold returns nan). 2.1.4 carries the fix.
+xgboost==2.1.4
+# shap 0.46 ships no cp313 wheel and falls back to a source build that needs
+# MSVC. 0.48.0 publishes prebuilt cp313 wheels, so the install stays toolchain-free.
+shap==0.48.0
+imbalanced-learn==0.13.0
+joblib==1.4.2
+scipy==1.15.0
+
+# ---- Signals: PCG + ECG (Blueprint Sections 18, 19) ----
+librosa==0.10.2.post1
+soundfile==0.12.1
+wfdb==4.3.1
+
+# ---- Report image auto-fill (Document Intelligence layer) ----
+# OCR engine (text detection + recognition) for reading printed lab reports.
+# First run downloads model weights (cached thereafter). CPU build is sufficient.
+paddlepaddle==3.3.1
+paddleocr==3.7.0
+# Lightweight fallback OCR engine, used only if the primary can't be loaded.
+pytesseract==0.3.13
+Pillow==11.1.0
+
+# ---- Logging ----
+structlog==24.4.0
+
+# ---- Testing (Blueprint Section 28) ----
+pytest==8.3.4
+pytest-cov==6.0.0
+httpx==0.28.1

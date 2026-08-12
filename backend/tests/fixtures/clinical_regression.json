@@ -1,0 +1,20 @@
+{
+  "input": {
+    "age": 59.0,
+    "sex": 1.0,
+    "cp": 0.0,
+    "trestbps": 138.0,
+    "chol": 271.0,
+    "fbs": 0.0,
+    "restecg": 0.0,
+    "thalach": 182.0,
+    "exang": 0.0,
+    "oldpeak": 0.0,
+    "slope": 2.0,
+    "ca": 0.0,
+    "thal": 2.0
+  },
+  "expected_score": 0.252248,
+  "tolerance": 0.02,
+  "model_version": "clinical-v1"
+}

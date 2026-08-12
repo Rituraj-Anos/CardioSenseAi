@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-text-primary font-sans antialiased;
+  }
+  /* Visible focus for keyboard users — accessibility is a stated requirement
+     (Blueprint Section 12), not an afterthought. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+  }
+  ::selection {
+    @apply bg-primary/20;
+  }
+  /* Subtle, calm scrollbars. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5d1 transparent;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-surface rounded-card border border-border p-card-padding shadow-card;
+  }
+  .card-interactive {
+    @apply card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-control px-4 py-2.5
+           text-sm font-semibold transition-all duration-150 disabled:opacity-50
+           disabled:cursor-not-allowed active:scale-[0.98];
+  }
+  .btn-primary {
+    @apply btn bg-primary-gradient text-white shadow-sm hover:shadow-md hover:brightness-105;
+  }
+  .btn-secondary {
+    @apply btn bg-surface text-text-primary border border-border hover:bg-primary-soft hover:border-primary/30;
+  }
+  .btn-ghost {
+    @apply btn text-text-secondary hover:bg-primary-soft hover:text-primary;
+  }
+  .input {
+    @apply w-full rounded-control border border-border bg-surface px-3 py-2.5
+           text-sm text-text-primary placeholder:text-text-tertiary transition-colors
+           focus:border-primary hover:border-primary/40;
+  }
+  .label {
+    @apply block text-sm font-medium text-text-primary mb-1.5;
+  }
+  .mono {
+    @apply font-mono tabular-nums;
+  }
+  /* Loading skeleton block with a shimmer sweep. */
+  .skeleton {
+    @apply relative overflow-hidden rounded-control bg-border/60;
+  }
+  .skeleton::after {
+    content: "";
+    @apply absolute inset-0 -translate-x-full animate-shimmer
+           bg-gradient-to-r from-transparent via-white/60 to-transparent;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+  .stat-value {
+    @apply mono text-3xl font-bold tracking-tight;
+  }
+}

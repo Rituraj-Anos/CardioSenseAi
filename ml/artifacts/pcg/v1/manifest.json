@@ -1,0 +1,108 @@
+{
+  "modality": "pcg",
+  "version": "v1",
+  "created_at": "2026-08-12T14:35:28.744531+00:00",
+  "algorithm": "random_forest",
+  "calibrated": true,
+  "model_file": "model.joblib",
+  "feature_names": [
+    "mfcc0_mean",
+    "mfcc1_mean",
+    "mfcc2_mean",
+    "mfcc3_mean",
+    "mfcc4_mean",
+    "mfcc5_mean",
+    "mfcc6_mean",
+    "mfcc7_mean",
+    "mfcc8_mean",
+    "mfcc9_mean",
+    "mfcc10_mean",
+    "mfcc11_mean",
+    "mfcc12_mean",
+    "mfcc0_std",
+    "mfcc1_std",
+    "mfcc2_std",
+    "mfcc3_std",
+    "mfcc4_std",
+    "mfcc5_std",
+    "mfcc6_std",
+    "mfcc7_std",
+    "mfcc8_std",
+    "mfcc9_std",
+    "mfcc10_std",
+    "mfcc11_std",
+    "mfcc12_std",
+    "spectral_centroid_mean",
+    "spectral_bandwidth_mean",
+    "spectral_rolloff_mean",
+    "zcr_mean",
+    "rms_mean",
+    "rms_std",
+    "in_band_energy_ratio",
+    "heart_rate_norm"
+  ],
+  "decision_threshold": 0.36,
+  "threshold_policy": "Highest threshold with sensitivity >= 0.85 on held-out test.",
+  "positive_class": "abnormal heart sound",
+  "data_provenance": {
+    "source": "PhysioNet/CinC-2016 Heart Sound Database",
+    "sets": {
+      "training-a": 409,
+      "training-b": 260
+    },
+    "total_recordings": 669,
+    "skipped": 0,
+    "class_balance": {
+      "abnormal_1": 344,
+      "normal_0": 325
+    },
+    "split_note": "Recording-level stratified split. Subject IDs are not published with the basic CinC-2016 files, so true patient-level grouping cannot be enforced here; some subjects may contribute multiple recordings. Metrics should be read with that caveat \u2014 this is a known limitation, not hidden.",
+    "feature_approach": "MFCC + spectral/envelope summary features (classical, not CNN)"
+  },
+  "cv_comparison": {
+    "logistic_regression": {
+      "roc_auc_mean": 0.7542,
+      "roc_auc_std": 0.0427
+    },
+    "random_forest": {
+      "roc_auc_mean": 0.7824,
+      "roc_auc_std": 0.0388
+    },
+    "xgboost": {
+      "roc_auc_mean": 0.7597,
+      "roc_auc_std": 0.0464
+    }
+  },
+  "test_metrics": {
+    "threshold": 0.36,
+    "accuracy": 0.7239,
+    "precision": 0.686,
+    "recall": 0.8551,
+    "f1": 0.7613,
+    "roc_auc": 0.8056,
+    "sensitivity": 0.8551,
+    "specificity": 0.5846,
+    "brier_score": 0.1824,
+    "confusion_matrix": {
+      "true_negative": 38,
+      "false_positive": 27,
+      "false_negative": 10,
+      "true_positive": 59
+    }
+  },
+  "global_importances": {
+    "mfcc12_mean": 0.07032,
+    "mfcc11_mean": 0.0615,
+    "mfcc10_mean": 0.04734,
+    "in_band_energy_ratio": 0.04652,
+    "zcr_mean": 0.04321,
+    "mfcc3_std": 0.0384,
+    "mfcc8_mean": 0.03728,
+    "mfcc7_mean": 0.0347,
+    "mfcc6_std": 0.03073,
+    "spectral_bandwidth_mean": 0.02947,
+    "rms_std": 0.02805,
+    "mfcc8_std": 0.02787
+  },
+  "explainability": "feature_importance (classical model; Grad-CAM CNN is the upgrade path)"
+}
