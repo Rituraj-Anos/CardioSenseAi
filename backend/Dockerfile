@@ -35,7 +35,9 @@ USER appuser
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
-    CMD curl -fsS http://localhost:8000/health || exit 1
+    CMD curl -fsS "http://localhost:${PORT:-8000}/health" || exit 1
 
 # Production entrypoint. APP_ENV/SECRET_KEY/DATABASE_URL supplied via env.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
+# Shell form so hosts that inject $PORT (Render, HF Spaces, etc.) are honoured;
+# defaults to 8000 locally. Applies migrations before serving.
+CMD sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers"

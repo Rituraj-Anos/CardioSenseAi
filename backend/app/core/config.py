@@ -63,8 +63,24 @@ class Settings(BaseSettings):
     # than showing empty states on first login.
     provision_demo_data: bool = True
 
+    # Warm the OCR engine at startup. Disable on small (<1GB RAM) free hosts so
+    # boot doesn't load the heavy model into memory (OCR then loads on first use).
+    enable_ocr_warmup: bool = True
+
     # ---- Monitoring ----
     sentry_dsn: str | None = None
+
+    @field_validator("database_url")
+    @classmethod
+    def _normalise_db_url(cls, v: str) -> str:
+        # Managed hosts (Render, Neon, Heroku, Railway) hand out `postgres://`
+        # or bare `postgresql://` URLs. SQLAlchemy 2 + psycopg3 needs an explicit
+        # driver, so normalise to `postgresql+psycopg://`.
+        if v.startswith("postgres://"):
+            return "postgresql+psycopg://" + v[len("postgres://"):]
+        if v.startswith("postgresql://") and "+" not in v.split("://", 1)[0]:
+            return "postgresql+psycopg://" + v[len("postgresql://"):]
+        return v
 
     @field_validator("app_env")
     @classmethod

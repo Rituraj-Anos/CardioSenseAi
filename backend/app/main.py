@@ -36,14 +36,16 @@ async def lifespan(app: FastAPI):
     # Warm the clinical model so the first real request is not the slow one.
     predictor = get_clinical_predictor()
 
-    # Warm the OCR document parser in a BACKGROUND thread — loading PaddleOCR
+    # Warm the OCR document parser in a BACKGROUND thread — loading the engine
     # takes ~20-25s and must not block app startup. The first report upload
-    # before it finishes will simply load it on demand.
-    import threading
+    # before it finishes will simply load it on demand. Skipped on low-RAM
+    # hosts (set ENABLE_OCR_WARMUP=false) so boot doesn't OOM.
+    if settings.enable_ocr_warmup:
+        import threading
 
-    from app.ml.clinical.report_extraction import warm_up as warm_ocr
+        from app.ml.clinical.report_extraction import warm_up as warm_ocr
 
-    threading.Thread(target=warm_ocr, name="ocr-warmup", daemon=True).start()
+        threading.Thread(target=warm_ocr, name="ocr-warmup", daemon=True).start()
 
     log.info(
         "startup",
