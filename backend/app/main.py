@@ -133,6 +133,20 @@ def health() -> dict:
     return {"status": "ok", "env": settings.app_env}
 
 
+@app.get(f"{api_prefix}/system/ocr-status", tags=["meta"])
+def ocr_status() -> dict:
+    """Diagnostic: is the OCR engine loaded? What engine is active?"""
+    from app.ml.clinical.document_parser import _OCREngine, structure_available
+    engine = _OCREngine.get()
+    return {
+        "paddleocr_available": structure_available(),
+        "paddleocr_loaded": engine is not None,
+        "paddleocr_load_failed": _OCREngine._load_failed,
+        "active_engine": "paddleocr" if engine else "tesseract-fallback",
+        "note": "If paddleocr_load_failed is true, the engine couldn't initialize (likely memory or missing dep). Tesseract is used as fallback.",
+    }
+
+
 @app.get(f"{api_prefix}/system/models", tags=["meta"])
 def models() -> dict:
     """Which modalities can actually contribute a score right now.
