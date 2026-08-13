@@ -103,6 +103,12 @@ def parse_document(path: str | Path) -> tuple[list[Pair], str, str]:
             log.warning("paddle_predict_failed", error=str(exc))
 
     text = _tesseract_text(path)
+    boxes = _tesseract_boxes(path)
+    if boxes:
+        # Use geometric row reconstruction (same as the Paddle path) — this is
+        # what makes tables work with Tesseract.
+        pairs = _reconstruct(boxes)
+        return pairs, "tesseract-structured", text
     return _pairs_from_text(text), "tesseract-fallback", text
 
 
@@ -281,3 +287,82 @@ def _tesseract_text(path: str | Path) -> str:
         return pytesseract.image_to_string(image)
     except Exception:  # pragma: no cover
         return ""
+
+
+def _tesseract_boxes(path: str | Path) -> list[Box]:
+    """Tesseract TSV mode: returns MERGED phrase boxes for row reconstruction.
+
+    Tesseract outputs individual words. To match PaddleOCR's behavior (which
+    returns whole text-line boxes), we merge adjacent words on the same line
+    (within a small gap) into phrase boxes. Then row-reconstruction works.
+    """
+    if not _tesseract_available():
+        return []
+    import pytesseract
+    from PIL import Image, ImageOps
+
+    image = Image.open(path).convert("RGB")
+    image = ImageOps.autocontrast(ImageOps.grayscale(image))
+    if max(image.size) < 1600:
+        scale = 1600 / max(image.size)
+        image = image.resize((int(image.width * scale), int(image.height * scale)))
+    try:
+        tsv = pytesseract.image_to_data(image, output_type=pytesseract.Output.DICT)
+    except Exception:
+        return []
+
+    # First pass: collect raw word entries with block/line grouping.
+    WordEntry = tuple  # (text, left, top, width, height, block_num, line_num)
+    words: list[WordEntry] = []
+    n = len(tsv.get("text", []))
+    for i in range(n):
+        text = str(tsv["text"][i]).strip()
+        conf = int(tsv["conf"][i]) if str(tsv["conf"][i]) != "-1" else 0
+        if not text or conf < 25:
+            continue
+        words.append((
+            text,
+            float(tsv["left"][i]),
+            float(tsv["top"][i]),
+            float(tsv["width"][i]),
+            float(tsv["height"][i]),
+            int(tsv["block_num"][i]),
+            int(tsv["line_num"][i]),
+        ))
+
+    if not words:
+        return []
+
+    # Second pass: merge words that share the same block+line into phrase boxes.
+    # Within a line, if the gap between word_end and next_word_start is < 3x the
+    # median word height, they're part of the same phrase (same table cell).
+    from itertools import groupby
+
+    median_h = sorted(w[4] for w in words)[len(words) // 2] or 12.0
+    gap_threshold = median_h * 2.5
+
+    boxes: list[Box] = []
+    for (blk, ln), group in groupby(words, key=lambda w: (w[5], w[6])):
+        line_words = sorted(group, key=lambda w: w[1])  # sort by x
+
+        # Merge into phrases by gap
+        phrases: list[list] = [[line_words[0]]]
+        for w in line_words[1:]:
+            prev = phrases[-1][-1]
+            prev_end = prev[1] + prev[3]  # left + width
+            gap = w[1] - prev_end
+            if gap < gap_threshold:
+                phrases[-1].append(w)
+            else:
+                phrases.append([w])
+
+        for phrase in phrases:
+            text = " ".join(w[0] for w in phrase)
+            left = phrase[0][1]
+            top = min(w[2] for w in phrase)
+            bottom = max(w[2] + w[4] for w in phrase)
+            cy = (top + bottom) / 2
+            h = bottom - top
+            boxes.append((text, left, cy, h))
+
+    return boxes
