@@ -163,3 +163,5 @@ tools/
 data/pcg/
 *-train.log
 *-download.log
+frontend/tsconfig.tsbuildinfo
+*.tsbuildinfo
