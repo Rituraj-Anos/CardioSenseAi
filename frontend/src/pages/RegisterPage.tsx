@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Loader2, UserPlus } from "lucide-react";
 import { apiError, authApi } from "@/lib/api";
+import { checkPassword } from "@/lib/passwordCheck";
 import { useAuthStore } from "@/store/auth";
 import { ErrorNote } from "@/components/ui";
 import { AuthShell } from "./auth/AuthShell";
@@ -15,33 +16,13 @@ export function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [strength, setStrength] = useState<{ score: number; errors: string[]; ok: boolean }>({
-    score: 0,
-    errors: [],
-    ok: false,
-  });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  // Live strength check (debounced) against the server so the meter and the
-  // server's policy always agree.
-  const debounce = useRef<number>(0);
-  useEffect(() => {
-    if (!password) {
-      setStrength({ score: 0, errors: [], ok: false });
-      return;
-    }
-    window.clearTimeout(debounce.current);
-    debounce.current = window.setTimeout(async () => {
-      try {
-        const r = await authApi.checkPassword(password, email || undefined);
-        setStrength(r);
-      } catch {
-        /* ignore transient errors */
-      }
-    }, 250);
-    return () => window.clearTimeout(debounce.current);
-  }, [password, email]);
+  // Password strength is evaluated CLIENT-SIDE (mirrors the server policy), so
+  // the meter and the submit button work regardless of network/backend state.
+  // The server re-validates on registration, so this can never weaken security.
+  const strength = useMemo(() => checkPassword(password, email || undefined), [password, email]);
 
   const passwordsMatch = password.length > 0 && password === confirm;
   const canSubmit = fullName && email && strength.ok && passwordsMatch && !busy;
